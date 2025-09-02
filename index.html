@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>All In One — Tools</title>
+  <meta name="description" content="All In One: a fast, modern, single-file multi-tool website. Calculator, converters, encoders, JSON, UUID, hash, image tools, timers, notes, and more." />
+  <meta name="theme-color" content="#1E1E2F" />
+  
+  <!-- Google Ads / AdSense READY: Replace data-ad-client and enable the script below when you have a valid Publisher ID.  -->
+  <!--
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=YOUR-ADSENSE-CLIENT-ID" crossorigin="anonymous"></script>
+  -->
+
+  <style>
+    :root{
+      /* Core palette */
+      --bg:#1E1E2F;           /* dark navy */
+      --panel:#24243A;        /* slightly lighter panel */
+      --panel-2:#2C2C45;
+      --card:#272743;
+      --muted:#8A8AA2;
+      --text:#F2F2F7;
+      --brand:#7C87FF;        /* soft indigo accent */
+      --brand-2:#54E1B5;      /* mint accent */
+      --danger:#FF6B6B;
+      --ok:#39D98A;
+      --warning:#FFB020;
+      --shadow:0 10px 30px rgba(0,0,0,.35);
+      --radius:16px;
+      --ring:0 0 0 2px rgba(124,135,255,.35);
+    }
+    html,body{height:100%;}
+    *{box-sizing:border-box}
+    body{
+      margin:0; font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji", "Segoe UI Emoji";
+      background: radial-gradient(1000px 600px at 15% -10%, rgba(124,135,255,.12), transparent 60%),
+                  radial-gradient(800px 500px at 85% 10%, rgba(84,225,181,.10), transparent 60%),
+                  var(--bg);
+      color:var(--text);
+      line-height:1.45;
+    }
+    a{color:var(--brand)}
+
+    /* Layout */
+    header{
+      position:sticky; top:0; z-index:50;
+      backdrop-filter: blur(8px);
+      background: linear-gradient(180deg, rgba(30,30,47,.9), rgba(30,30,47,.6));
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .wrap{max-width:1200px; margin-inline:auto; padding:16px;}
+    .topbar{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px; font-weight:700; letter-spacing:.3px;
+    }
+    .logo{width:36px; height:36px; display:grid; place-items:center; border-radius:12px; background:linear-gradient(135deg,var(--brand),var(--brand-2)); box-shadow:var(--shadow)}
+    .title{font-size:1.1rem}
+
+    .searchbar{flex:1; display:flex; gap:10px; align-items:center; background:var(--panel); border:1px solid rgba(255,255,255,.06); border-radius:12px; padding:10px 12px; box-shadow:inset 0 1px 0 rgba(255,255,255,.03)}
+    .searchbar input{flex:1; background:transparent; border:0; outline:0; color:var(--text); font-size:0.95rem}
+    .kbd{font-size:.75rem; color:var(--muted); border:1px solid rgba(255,255,255,.1); padding:2px 6px; border-radius:6px}
+
+    .grid{display:grid; gap:16px; grid-template-columns: repeat(12, 1fr)}
+    .cards{margin-top:18px}
+    .card{grid-column: span 6; background:linear-gradient(180deg,var(--card),var(--panel-2)); border:1px solid rgba(255,255,255,.06); border-radius:var(--radius); padding:16px; box-shadow:var(--shadow); transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease}
+    .card:hover{transform: translateY(-2px); box-shadow: 0 16px 40px rgba(0,0,0,.45); border-color: rgba(124,135,255,.35)}
+    .card h2{margin:0 0 8px; font-size:1.05rem; display:flex; align-items:center; justify-content:space-between}
+    .card p.hint{margin-top:0; margin-bottom:12px; color:var(--muted); font-size:.9rem}
+    .row{display:flex; gap:10px; align-items:center}
+    .col{flex:1}
+    .stack{display:flex; flex-direction:column; gap:10px}
+    .area{width:100%; min-height:110px; background:var(--panel); color:var(--text); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px; resize:vertical}
+    .input, select{width:100%; background:var(--panel); color:var(--text); border:1px solid rgba(255,255,255,.08); border-radius:12px; padding:10px}
+    .btn{appearance:none; border:1px solid rgba(255,255,255,.12); background:linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); color:var(--text); padding:10px 12px; border-radius:12px; cursor:pointer; font-weight:600; transition: transform .1s ease, background .2s ease, box-shadow .2s ease}
+    .btn:hover{box-shadow:var(--ring)}
+    .btn:active{transform:translateY(1px)}
+    .btn.primary{background: linear-gradient(135deg, rgba(124,135,255,.35), rgba(84,225,181,.35)); border-color: transparent}
+    .btn.danger{border-color: rgba(255,107,107,.3); background: linear-gradient(180deg, rgba(255,107,107,.25), rgba(255,107,107,.18));}
+    label{font-size:.85rem; color:var(--muted)}
+    code.inline{background: rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08); padding:2px 6px; border-radius:6px}
+    .pill{display:inline-flex; align-items:center; gap:8px; font-size:.8rem; border:1px solid rgba(255,255,255,.1); border-radius:999px; padding:6px 10px; color:var(--muted)}
+    .muted{color:var(--muted)}
+    .sep{height:1px; background:linear-gradient(90deg, rgba(255,255,255,.06), rgba(255,255,255,.02)); margin:10px 0 6px}
+
+    .footer{margin:28px 0 60px; color:var(--muted); display:flex; justify-content:space-between; align-items:center; gap:10px}
+
+    /* Responsive */
+    @media (max-width: 1000px){ .card{grid-column: span 12} }
+    @media (max-width: 700px){ .topbar{flex-wrap:wrap; gap:8px} .title{display:none} }
+
+    /* Modal (Command Palette) */
+    dialog{ width:min(680px, 92vw); border:1px solid rgba(255,255,255,.1); border-radius:18px; background:linear-gradient(180deg,var(--panel),var(--panel-2)); color:var(--text); box-shadow: var(--shadow)}
+    dialog::backdrop{ backdrop-filter: blur(3px); background: rgba(0,0,0,.35)}
+    .palette{padding:12px}
+    .palette .search{ display:flex; align-items:center; gap:10px; padding:10px 12px; border-radius:12px; background:var(--card); border:1px solid rgba(255,255,255,.06)}
+    .palette .search input{ flex:1; background:transparent; border:0; outline:0; color:var(--text)}
+    .palette ul{ list-style:none; padding:0; margin:12px 0 0; max-height:50vh; overflow:auto}
+    .palette li{ padding:10px 12px; border-radius:10px; display:flex; justify-content:space-between; align-items:center}
+    .palette li[aria-selected="true"], .palette li:hover{ background:rgba(124,135,255,.15)}
+
+    /* Ad container styles */
+    .ad-slot{ display:grid; place-items:center; background:rgba(255,255,255,.03); border:1px dashed rgba(255,255,255,.12); border-radius:12px; padding:14px; color:var(--muted)}
+
+    /* Small helper */
+    .copy-out{ display:flex; gap:8px; align-items:center }
+    .mono{ font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap topbar" role="banner">
+      <div class="brand" aria-label="All In One">
+        <div class="logo" aria-hidden="true">🔧</div>
+        <div class="title">All In One</div>
+      </div>
+      <div class="searchbar" role="search">
+        <input id="globalSearch" type="search" placeholder="Search tools… (Press Ctrl/⌘+K for command palette)" aria-label="Global search" />
+        <span class="kbd" aria-hidden="true">Ctrl/⌘ + K</span>
+      </div>
+      <button id="openPalette" class="btn" aria-label="Open command palette">Quick Open</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- AdSense-ready slot (Top). Replace with your <ins class="adsbygoogle"> element when live. -->
+    <div class="ad-slot" aria-label="advertisement">
+      <small>Ad Slot — insert AdSense tag here</small>
+    </div>
+
+    <!-- TOOL GRID -->
+    <section id="tools" class="grid cards" aria-label="All tools">
+
+      <!-- 1) Calculator -->
+      <article class="card stack" data-name="calculator" id="tool-calculator" aria-labelledby="calc-title">
+        <h2 id="calc-title">Calculator <span class="pill mono">basic arithmetic</span></h2>
+        <input id="calcDisplay" class="input mono" aria-label="calculator display" readonly>
+        <div class="grid" style="gap:8px; grid-template-columns:repeat(4,1fr)">
+          <button class="btn" data-calc>7</button>
+          <button class="btn" data-calc>8</button>
+          <button class="btn" data-calc>9</button>
+          <button class="btn" data-calc>÷</button>
+          <button class="btn" data-calc>4</button>
+          <button class="btn" data-calc>5</button>
+          <button class="btn" data-calc>6</button>
+          <button class="btn" data-calc>×</button>
+          <button class="btn" data-calc>1</button>
+          <button class="btn" data-calc>2</button>
+          <button class="btn" data-calc>3</button>
+          <button class="btn" data-calc>−</button>
+          <button class="btn" data-calc>0</button>
+          <button class="btn" data-calc>.</button>
+          <button class="btn danger" id="calcClear">C</button>
+          <button class="btn" data-calc>+</button>
+          <button class="btn primary" id="calcEq" style="grid-column: span 4">=</button>
+        </div>
+      </article>
+
+      <!-- 2) Unit Converter -->
+      <article class="card stack" data-name="unit converter length weight temperature" id="tool-unit" aria-labelledby="unit-title">
+        <h2 id="unit-title">Unit Converter <span class="pill">length • weight • temperature</span></h2>
+        <div class="grid" style="grid-template-columns: repeat(12,1fr); gap:10px">
+          <div class="stack" style="grid-column: span 12">
+            <label for="unitCategory">Category</label>
+            <select id="unitCategory" class="input" aria-label="unit category">
+              <option value="length">Length</option>
+              <option value="weight">Weight</option>
+              <option value="temperature">Temperature</option>
+            </select>
+          </div>
+          <div class="stack" style="grid-column: span 6">
+            <label for="unitFrom">From</label>
+            <select id="unitFrom" class="input"></select>
+            <input id="unitFromVal" class="input" type="number" step="any" placeholder="Value">
+          </div>
+          <div class="stack" style="grid-column: span 6">
+            <label for="unitTo">To</label>
+            <select id="unitTo" class="input"></select>
+            <input id="unitToVal" class="input" type="text" placeholder="Result" readonly>
+          </div>
+          <div style="grid-column: span 12"><button id="unitSwap" class="btn">Swap</button></div>
+        </div>
+      </article>
+
+      <!-- 3) Text Utilities -->
+      <article class="card stack" data-name="text utilities uppercase lowercase word count remove spaces" id="tool-text" aria-labelledby="text-title">
+        <h2 id="text-title">Text Utilities <span class="pill">case • count • clean</span></h2>
+        <textarea id="textArea" class="area" placeholder="Paste or type text…"></textarea>
+        <div class="row">
+          <button class="btn" id="toUpper">UPPERCASE</button>
+          <button class="btn" id="toLower">lowercase</button>
+          <button class="btn" id="removeSpaces">Remove extra spaces</button>
+          <button class="btn" id="copyText">Copy</button>
+        </div>
+        <div class="muted" id="textStats" aria-live="polite">Words: 0 • Chars: 0</div>
+      </article>
+
+      <!-- 4) Base64 Encode/Decode -->
+      <article class="card stack" data-name="base64 encoder decode" id="tool-base64" aria-labelledby="b64-title">
+        <h2 id="b64-title">Base64 Encode / Decode</h2>
+        <textarea id="b64Input" class="area mono" placeholder="Input text…"></textarea>
+        <div class="row">
+          <button class="btn" id="b64Enc">Encode</button>
+          <button class="btn" id="b64Dec">Decode</button>
+          <button class="btn" id="b64Clear">Clear</button>
+          <button class="btn" id="b64Copy">Copy result</button>
+        </div>
+        <textarea id="b64Output" class="area mono" placeholder="Result…" readonly></textarea>
+      </article>
+
+      <!-- 5) URL Encoder/Decoder -->
+      <article class="card stack" data-name="url encoder decoder" id="tool-url" aria-labelledby="url-title">
+        <h2 id="url-title">URL Encoder / Decoder</h2>
+        <textarea id="urlInput" class="area mono" placeholder="Input text or URL…"></textarea>
+        <div class="row">
+          <button class="btn" id="urlEnc">Encode</button>
+          <button class="btn" id="urlDec">Decode</button>
+          <button class="btn" id="urlClear">Clear</button>
+          <button class="btn" id="urlCopy">Copy result</button>
+        </div>
+        <textarea id="urlOutput" class="area mono" placeholder="Result…" readonly></textarea>
+      </article>
+
+      <!-- 6) JSON Formatter/Validator -->
+      <article class="card stack" data-name="json formatter validator" id="tool-json" aria-labelledby="json-title">
+        <h2 id="json-title">JSON Formatter & Validator</h2>
+        <textarea id="jsonInput" class="area mono" placeholder='{"hello":"world"}'></textarea>
+        <div class="row">
+          <button class="btn" id="jsonFormat">Format</button>
+          <button class="btn" id="jsonMinify">Minify</button>
+          <button class="btn" id="jsonCopy">Copy</button>
+        </div>
+        <textarea id="jsonOutput" class="area mono" placeholder="Result…" readonly></textarea>
+        <div id="jsonStatus" class="muted" aria-live="polite">Status: waiting…</div>
+      </article>
+
+      <!-- 7) Password Generator -->
+      <article class="card stack" data-name="password generator" id="tool-pass" aria-labelledby="pass-title">
+        <h2 id="pass-title">Password Generator</h2>
+        <div class="row">
+          <div class="col stack">
+            <label for="passLength">Length: <span id="passLengthVal">16</span></label>
+            <input id="passLength" class="input" type="range" min="6" max="64" value="16" />
+          </div>
+          <div class="col stack">
+            <label>Character sets</label>
+            <div class="row" style="flex-wrap:wrap; gap:8px">
+              <label><input type="checkbox" id="setLower" checked> a-z</label>
+              <label><input type="checkbox" id="setUpper" checked> A-Z</label>
+              <label><input type="checkbox" id="setNum" checked> 0-9</label>
+              <label><input type="checkbox" id="setSym"> !@#$…</label>
+            </div>
+          </div>
+        </div>
+        <div class="copy-out">
+          <input id="passOut" class="input mono" readonly placeholder="Generated password" />
+          <button class="btn" id="passGen">Generate</button>
+          <button class="btn" id="passCopy">Copy</button>
+        </div>
+      </article>
+
+      <!-- 8) UUID v4 Generator -->
+      <article class="card stack" data-name="uuid generator" id="tool-uuid" aria-labelledby="uuid-title">
+        <h2 id="uuid-title">UUID v4 Generator</h2>
+        <div class="copy-out">
+          <input id="uuidOut" class="input mono" readonly placeholder="Click generate" />
+          <button class="btn" id="uuidGen">Generate</button>
+          <button class="btn" id="uuidCopy">Copy</button>
+        </div>
+      </article>
+
+      <!-- 9) Hash Generator (SHA-256) -->
+      <article class="card stack" data-name="hash generator sha256" id="tool-hash" aria-labelledby="hash-title">
+        <h2 id="hash-title">Hash Generator <span class="pill mono">SHA‑256</span></h2>
+        <textarea id="hashText" class="area mono" placeholder="Text to hash…"></textarea>
+        <div class="row">
+          <input id="hashFile" class="input" type="file" aria-label="File to hash" />
+          <button class="btn" id="hashRun">Hash</button>
+          <button class="btn" id="hashCopy">Copy hash</button>
+        </div>
+        <input id="hashOut" class="input mono" readonly placeholder="SHA-256 will appear here" />
+      </article>
+
+      <!-- 10) Image Resizer & Compressor -->
+      <article class="card stack" data-name="image resizer compressor" id="tool-image" aria-labelledby="img-title">
+        <h2 id="img-title">Image Resizer & Compressor</h2>
+        <input id="imgFile" type="file" accept="image/*" class="input" />
+        <div class="row">
+          <div class="col stack">
+            <label>Width (px)</label>
+            <input id="imgW" class="input" type="number" min="1" placeholder="auto" />
+          </div>
+          <div class="col stack">
+            <label>Height (px)</label>
+            <input id="imgH" class="input" type="number" min="1" placeholder="auto" />
+          </div>
+          <div class="col stack">
+            <label for="imgQ">Quality: <span id="imgQVal">0.8</span></label>
+            <input id="imgQ" type="range" min="0.1" max="1" step="0.05" value="0.8" />
+          </div>
+        </div>
+        <div class="row">
+          <label><input type="checkbox" id="imgKeepAspect" checked> Keep aspect</label>
+        </div>
+        <div class="row">
+          <button class="btn" id="imgProcess">Process</button>
+          <a class="btn" id="imgDownload" download="image-processed.jpg" href="#" aria-label="Download processed image">Download</a>
+        </div>
+        <canvas id="imgCanvas" style="max-width:100%; border-radius:12px; display:none"></canvas>
+        <div id="imgInfo" class="muted"></div>
+      </article>
+
+      <!-- 11) Color Picker + Contrast Checker -->
+      <article class="card stack" data-name="color picker contrast checker" id="tool-color" aria-labelledby="color-title">
+        <h2 id="color-title">Color Picker + Contrast Checker</h2>
+        <div class="row">
+          <div class="col stack">
+            <label>Foreground</label>
+            <input id="fgColor" type="color" value="#FFFFFF" class="input" />
+            <input id="fgHex" class="input mono" value="#FFFFFF" />
+          </div>
+          <div class="col stack">
+            <label>Background</label>
+            <input id="bgColor" type="color" value="#1E1E2F" class="input" />
+            <input id="bgHex" class="input mono" value="#1E1E2F" />
+          </div>
+        </div>
+        <div id="contrastDemo" style="border-radius:12px; padding:18px; text-align:center; background: var(--bg)">
+          <div id="contrastText" style="font-size:1.2rem;">Preview Aa</div>
+        </div>
+        <div id="contrastInfo" class="muted">Ratio: –</div>
+      </article>
+
+      <!-- 12) Stopwatch & Countdown Timer -->
+      <article class="card stack" data-name="stopwatch countdown timer" id="tool-time" aria-labelledby="time-title">
+        <h2 id="time-title">Stopwatch & Countdown</h2>
+        <div class="grid" style="grid-template-columns: repeat(12,1fr); gap:12px">
+          <div class="stack" style="grid-column: span 6">
+            <label>Stopwatch</label>
+            <div id="swDisplay" class="input mono" aria-live="polite">00:00.00</div>
+            <div class="row">
+              <button class="btn" id="swStart">Start</button>
+              <button class="btn" id="swStop">Stop</button>
+              <button class="btn" id="swReset">Reset</button>
+            </div>
+          </div>
+          <div class="stack" style="grid-column: span 6">
+            <label>Countdown</label>
+            <div class="row">
+              <input id="cdMin" class="input" type="number" min="0" placeholder="Min"> 
+              <input id="cdSec" class="input" type="number" min="0" max="59" placeholder="Sec">
+            </div>
+            <div id="cdDisplay" class="input mono" aria-live="polite">00:00</div>
+            <div class="row">
+              <button class="btn" id="cdStart">Start</button>
+              <button class="btn" id="cdPause">Pause</button>
+              <button class="btn" id="cdReset">Reset</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- 13) Quick Notes (localStorage) -->
+      <article class="card stack" data-name="quick notes notepad" id="tool-notes" aria-labelledby="notes-title">
+        <h2 id="notes-title">Quick Notes <span class="pill">saved in your browser</span></h2>
+        <textarea id="notesArea" class="area" placeholder="Write anything… it's saved automatically."></textarea>
+        <div class="row">
+          <button class="btn" id="notesClear">Clear</button>
+          <span class="muted">Auto-saved <span id="notesSavedAt">never</span></span>
+        </div>
+      </article>
+
+      <!-- Additional Ad slot between tools -->
+      <div class="card ad-slot" aria-label="advertisement">
+        <small>Ad Slot — insert AdSense tag here</small>
+      </div>
+
+    </section>
+
+    <section class="footer" aria-label="Footer">
+      <div>Built with ❤️ — Vanilla HTML/CSS/JS • Dark mode by default</div>
+      <div class="muted">Tip: Press <span class="kbd">Ctrl/⌘ + K</span> to jump to any tool</div>
+    </section>
+  </main>
+
+  <!-- Command Palette Modal -->
+  <dialog id="cmdPalette" aria-label="Command palette">
+    <div class="palette">
+      <div class="search"><input type="text" id="cmdInput" placeholder="Type to find a tool…" aria-label="Palette search" /></div>
+      <ul id="cmdList"></ul>
+    </div>
+  </dialog>
+
+  <script>
+  // =============================================================
+  // Utility helpers
+  // =============================================================
+  const $ = (sel, root=document) => root.querySelector(sel);
+  const $$ = (sel, root=document) => Array.from(root.querySelectorAll(sel));
+
+  const copyToClipboard = async (text) => {
+    try{ await navigator.clipboard.writeText(text); toast('Copied'); }catch(e){ alert('Copy failed'); }
+  }
+  function toast(msg){
+    const t=document.createElement('div');
+    t.textContent=msg; t.style.position='fixed'; t.style.bottom='18px'; t.style.left='50%'; t.style.transform='translateX(-50%)';
+    t.style.background='rgba(0,0,0,.7)'; t.style.color='#fff'; t.style.padding='8px 12px'; t.style.borderRadius='10px'; t.style.boxShadow='var(--shadow)'; t.style.zIndex=1000; t.style.fontSize='.9rem';
+    document.body.appendChild(t); setTimeout(()=>t.remove(),1200);
+  }
+
+  // Global search filtering
+  const globalSearch = $('#globalSearch');
+  globalSearch.addEventListener('input', () => filterTools(globalSearch.value));
+  function filterTools(q){
+    q = q.toLowerCase().trim();
+    $$('#tools .card').forEach(card => {
+      const name = (card.dataset.name||'') + ' ' + (card.querySelector('h2')?.textContent||'');
+      card.style.display = name.toLowerCase().includes(q) ? '' : 'none';
+    });
+  }
+
+  // Command Palette (Ctrl/Cmd + K)
+  const palette = $('#cmdPalette');
+  const cmdInput = $('#cmdInput');
+  const cmdList = $('#cmdList');
+  const openPaletteBtn = $('#openPalette');
+  const tools = $$('#tools article.card');
+
+  function openPalette(){
+    cmdInput.value='';
+    renderCmdList('');
+    palette.showModal();
+    cmdInput.focus();
+  }
+  function closePalette(){ palette.close(); }
+
+  function renderCmdList(q){
+    q=q.toLowerCase();
+    const frag = document.createDocumentFragment();
+    tools.forEach(t => {
+      const name = t.querySelector('h2')?.textContent || 'Tool';
+      const txt = (t.dataset.name||'') + ' ' + name;
+      if(!q || txt.toLowerCase().includes(q)){
+        const li = document.createElement('li');
+        li.textContent = name; li.tabIndex=0; li.role='option';
+        li.addEventListener('click', () => { t.scrollIntoView({behavior:'smooth', block:'start'}); closePalette(); t.animate([{outline:'2px solid rgba(124,135,255,.6)'}], {duration:400}); });
+        frag.appendChild(li);
+      }
+    });
+    cmdList.innerHTML=''; cmdList.appendChild(frag);
+  }
+
+  openPaletteBtn.addEventListener('click', openPalette);
+  window.addEventListener('keydown', (e)=>{
+    if((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==='k'){
+      e.preventDefault(); openPalette();
+    } else if(e.key==='Escape' && palette.open){ closePalette(); }
+  });
+  cmdInput.addEventListener('input', (e)=>renderCmdList(e.target.value));
+
+  // =============================================================
+  // 1) Calculator
+  // =============================================================
+  const calcDisplay = $('#calcDisplay');
+  let calcBuf='';
+  $$('#tool-calculator [data-calc]').forEach(btn=>btn.addEventListener('click',()=>{
+    const v = btn.textContent;
+    calcBuf += ({'×':'*','÷':'/','−':'-'}[v]||v);
+    calcDisplay.value = calcBuf;
+  }));
+  $('#calcClear').addEventListener('click',()=>{calcBuf=''; calcDisplay.value='';});
+  $('#calcEq').addEventListener('click',()=>{
+    try{
+      // Simple safe eval: allow digits, operators, decimals and spaces only
+      if(!/^[-+*/().\d\s]+$/.test(calcBuf)) throw new Error('Invalid input');
+      const result = Function('return ('+calcBuf+')')();
+      calcDisplay.value = String(result);
+      calcBuf = String(result);
+    }catch(e){ toast('Error'); }
+  });
+
+  // =============================================================
+  // 2) Unit Converter
+  // =============================================================
+  const unitCategory = $('#unitCategory');
+  const unitFrom = $('#unitFrom');
+  const unitTo = $('#unitTo');
+  const unitFromVal = $('#unitFromVal');
+  const unitToVal = $('#unitToVal');
+
+  const units = {
+    length: { // base meter
+      m:1, km:1000, cm:0.01, mm:0.001, in:0.0254, ft:0.3048, yd:0.9144, mi:1609.344
+    },
+    weight: { // base kilogram
+      kg:1, g:0.001, lb:0.45359237, oz:0.028349523125
+    },
+    temperature: { // handled separately
+      C:'C', F:'F', K:'K'
+    }
+  };
+
+  function populateUnits(){
+    const cat = unitCategory.value;
+    const opts = Object.keys(units[cat]);
+    unitFrom.innerHTML = opts.map(u=>`<option>${u}</option>`).join('');
+    unitTo.innerHTML = opts.map(u=>`<option>${u}</option>`).join('');
+    unitFrom.value = opts[0]; unitTo.value = opts[1]||opts[0];
+    convertUnits();
+  }
+
+  function convertUnits(){
+    const cat = unitCategory.value, from = unitFrom.value, to = unitTo.value;
+    let val = parseFloat(unitFromVal.value);
+    if(Number.isNaN(val)){ unitToVal.value=''; return; }
+    if(cat==='temperature'){
+      // Convert to C first
+      let c;
+      if(from==='C') c=val;
+      if(from==='F') c=(val-32)*5/9;
+      if(from==='K') c=val-273.15;
+      let out=c;
+      if(to==='F') out=c*9/5+32;
+      if(to==='K') out=c+273.15;
+      if(to==='C') out=c;
+      unitToVal.value = String(+out.toFixed(4));
+      return;
+    }
+    // Linear categories
+    const base = val * units[cat][from];
+    const out = base / units[cat][to];
+    unitToVal.value = String(+out.toFixed(6));
+  }
+
+  unitCategory.addEventListener('change', populateUnits);
+  unitFrom.addEventListener('change', convertUnits);
+  unitTo.addEventListener('change', convertUnits);
+  unitFromVal.addEventListener('input', convertUnits);
+  $('#unitSwap').addEventListener('click', ()=>{ [unitFrom.value, unitTo.value]=[unitTo.value, unitFrom.value]; convertUnits(); });
+  populateUnits();
+
+  // =============================================================
+  // 3) Text Utilities
+  // =============================================================
+  const textArea = $('#textArea');
+  const textStats = $('#textStats');
+  const computeStats=()=>{
+    const t=textArea.value; const words=(t.trim()?t.trim().split(/\s+/):[]).length; const chars=t.length;
+    textStats.textContent = `Words: ${words} • Chars: ${chars}`;
+  };
+  textArea.addEventListener('input', computeStats);
+  $('#toUpper').addEventListener('click', ()=>{ textArea.value=textArea.value.toUpperCase(); computeStats();});
+  $('#toLower').addEventListener('click', ()=>{ textArea.value=textArea.value.toLowerCase(); computeStats();});
+  $('#removeSpaces').addEventListener('click', ()=>{ textArea.value=textArea.value.replace(/\s+/g,' ').trim(); computeStats();});
+  $('#copyText').addEventListener('click', ()=>copyToClipboard(textArea.value));
+  computeStats();
+
+  // =============================================================
+  // 4) Base64
+  // =============================================================
+  const b64Input=$('#b64Input'), b64Output=$('#b64Output');
+  $('#b64Enc').addEventListener('click',()=>{ try{ b64Output.value=btoa(unescape(encodeURIComponent(b64Input.value))); }catch(e){ toast('Invalid input'); }});
+  $('#b64Dec').addEventListener('click',()=>{ try{ b64Output.value=decodeURIComponent(escape(atob(b64Input.value))); }catch(e){ toast('Invalid base64'); }});
+  $('#b64Clear').addEventListener('click',()=>{ b64Input.value=''; b64Output.value='';});
+  $('#b64Copy').addEventListener('click',()=>copyToClipboard(b64Output.value));
+
+  // =============================================================
+  // 5) URL Encode/Decode
+  // =============================================================
+  const urlInput=$('#urlInput'), urlOutput=$('#urlOutput');
+  $('#urlEnc').addEventListener('click',()=>{ try{ urlOutput.value=encodeURIComponent(urlInput.value); }catch(e){ toast('Error'); }});
+  $('#urlDec').addEventListener('click',()=>{ try{ urlOutput.value=decodeURIComponent(urlInput.value); }catch(e){ toast('Invalid encoding'); }});
+  $('#urlClear').addEventListener('click',()=>{ urlInput.value=''; urlOutput.value='';});
+  $('#urlCopy').addEventListener('click',()=>copyToClipboard(urlOutput.value));
+
+  // =============================================================
+  // 6) JSON Formatter/Validator
+  // =============================================================
+  const jsonInput=$('#jsonInput'), jsonOutput=$('#jsonOutput'), jsonStatus=$('#jsonStatus');
+  function setJsonStatus(ok,msg){ jsonStatus.textContent = `Status: ${ok?'✅ Valid':'❌ Invalid'} — ${msg}`; jsonStatus.style.color = ok? 'var(--ok)' : 'var(--danger)'; }
+  $('#jsonFormat').addEventListener('click',()=>{ try{ const o=JSON.parse(jsonInput.value); jsonOutput.value=JSON.stringify(o,null,2); setJsonStatus(true,'Formatted'); }catch(e){ setJsonStatus(false, e.message); }});
+  $('#jsonMinify').addEventListener('click',()=>{ try{ const o=JSON.parse(jsonInput.value); jsonOutput.value=JSON.stringify(o); setJsonStatus(true,'Minified'); }catch(e){ setJsonStatus(false, e.message); }});
+  $('#jsonCopy').addEventListener('click',()=>copyToClipboard(jsonOutput.value));
+
+  // =============================================================
+  // 7) Password Generator
+  // =============================================================
+  const passLength=$('#passLength'), passLengthVal=$('#passLengthVal');
+  const setLower=$('#setLower'), setUpper=$('#setUpper'), setNum=$('#setNum'), setSym=$('#setSym');
+  const passOut=$('#passOut');
+  passLength.addEventListener('input',()=>passLengthVal.textContent=passLength.value);
+  function genPassword(){
+    const pools=[];
+    if(setLower.checked) pools.push('abcdefghijklmnopqrstuvwxyz');
+    if(setUpper.checked) pools.push('ABCDEFGHIJKLMNOPQRSTUVWXYZ');
+    if(setNum.checked) pools.push('0123456789');
+    if(setSym.checked) pools.push('!@#$%^&*()_+[]{}|;:,.<>?-=');
+    if(pools.length===0){ toast('Select at least one set'); return; }
+    const len=+passLength.value; let out='';
+    const rand=(n)=>crypto.getRandomValues(new Uint32Array(1))[0]%n;
+    // ensure at least one from each pool
+    pools.forEach(pool=> out += pool[rand(pool.length)] );
+    for(let i=out.length;i<len;i++){
+      const pool = pools[rand(pools.length)]; out+= pool[rand(pool.length)];
+    }
+    // shuffle
+    out = out.split('').sort(()=>Math.random()-.5).join('');
+    passOut.value=out; 
+  }
+  $('#passGen').addEventListener('click',genPassword);
+  $('#passCopy').addEventListener('click',()=>copyToClipboard(passOut.value));
+
+  // =============================================================
+  // 8) UUID v4
+  // =============================================================
+  function uuidv4(){
+    const b = crypto.getRandomValues(new Uint8Array(16));
+    b[6] = (b[6] & 0x0f) | 0x40; // version
+    b[8] = (b[8] & 0x3f) | 0x80; // variant
+    const hex = [...b].map(x=>x.toString(16).padStart(2,'0'));
+    return `${hex[0]}${hex[1]}${hex[2]}${hex[3]}-${hex[4]}${hex[5]}-${hex[6]}${hex[7]}-${hex[8]}${hex[9]}-${hex.slice(10).join('')}`;
+  }
+  $('#uuidGen').addEventListener('click',()=>{ $('#uuidOut').value = uuidv4(); });
+  $('#uuidCopy').addEventListener('click',()=>copyToClipboard($('#uuidOut').value));
+
+  // =============================================================
+  // 9) Hash Generator (SHA-256)
+  // =============================================================
+  const hashOut=$('#hashOut');
+  async function sha256FromArrayBuffer(buf){
+    const digest = await crypto.subtle.digest('SHA-256', buf);
+    return [...new Uint8Array(digest)].map(x=>x.toString(16).padStart(2,'0')).join('');
+  }
+  $('#hashRun').addEventListener('click', async ()=>{
+    const text = $('#hashText').value;
+    const file = $('#hashFile').files?.[0];
+    try{
+      let buf;
+      if(file){ buf = await file.arrayBuffer(); }
+      else{ buf = new TextEncoder().encode(text).buffer; }
+      const hex = await sha256FromArrayBuffer(buf);
+      hashOut.value = hex; 
+    }catch(e){ toast('Hashing failed'); }
+  });
+  $('#hashCopy').addEventListener('click',()=>copyToClipboard(hashOut.value));
+
+  // =============================================================
+  // 10) Image Resizer & Compressor (Canvas)
+  // =============================================================
+  const imgFile=$('#imgFile'), imgCanvas=$('#imgCanvas'), imgW=$('#imgW'), imgH=$('#imgH');
+  const imgKeepAspect=$('#imgKeepAspect'); const imgProcess=$('#imgProcess'); const imgDownload=$('#imgDownload'); const imgInfo=$('#imgInfo');
+  const imgQ=$('#imgQ'), imgQVal=$('#imgQVal'); imgQ.addEventListener('input', ()=> imgQVal.textContent=imgQ.value);
+  let img = new Image(); let originalW=0, originalH=0;
+  imgFile.addEventListener('change', async ()=>{
+    const file = imgFile.files?.[0]; if(!file) return;
+    const url = URL.createObjectURL(file);
+    await new Promise(res=>{ img.onload=()=>res(); img.src=url; });
+    originalW=img.naturalWidth; originalH=img.naturalHeight;
+    imgW.value=originalW; imgH.value=originalH; imgCanvas.style.display='none';
+    imgInfo.textContent = `Original: ${originalW}×${originalH} • ${(file.size/1024).toFixed(1)} KB`;
+  });
+  imgW.addEventListener('input',()=>{ if(imgKeepAspect.checked && originalW){ imgH.value = Math.round((+imgW.value/originalW)*originalH)||''; }});
+  imgH.addEventListener('input',()=>{ if(imgKeepAspect.checked && originalH){ imgW.value = Math.round((+imgH.value/originalH)*originalW)||''; }});
+  imgProcess.addEventListener('click', ()=>{
+    if(!img.src){ toast('Choose an image'); return; }
+    const w = parseInt(imgW.value)||originalW; const h = parseInt(imgH.value)||originalH; 
+    const q = parseFloat(imgQ.value)||0.8;
+    const canvas = imgCanvas; const ctx = canvas.getContext('2d');
+    canvas.width = w; canvas.height = h;
+    ctx.clearRect(0,0,w,h);
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(img,0,0,w,h);
+    canvas.toBlob(blob=>{
+      if(!blob){ toast('Failed'); return; }
+      const url = URL.createObjectURL(blob);
+      imgDownload.href = url; imgDownload.download = `image-${w}x${h}.jpg`;
+      imgCanvas.style.display='block';
+      imgInfo.textContent = `Output: ${w}×${h} • ${(blob.size/1024).toFixed(1)} KB`;
+    }, 'image/jpeg', q);
+  });
+
+  // =============================================================
+  // 11) Color Picker + Contrast (WCAG)
+  // =============================================================
+  const fgColor=$('#fgColor'), bgColor=$('#bgColor'), fgHex=$('#fgHex'), bgHex=$('#bgHex');
+  const contrastDemo=$('#contrastDemo'), contrastText=$('#contrastText'), contrastInfo=$('#contrastInfo');
+
+  function hexToRgb(hex){ hex=hex.replace('#',''); if(hex.length===3) hex=[...hex].map(x=>x+x).join(''); const bigint=parseInt(hex,16); return {r:(bigint>>16)&255,g:(bigint>>8)&255,b:bigint&255}; }
+  function sRGBtoLin(v){ v/=255; return v<=0.04045? v/12.92 : Math.pow((v+0.055)/1.055, 2.4); }
+  function relL(rgb){ const r=sRGBtoLin(rgb.r), g=sRGBtoLin(rgb.g), b=sRGBtoLin(rgb.b); return 0.2126*r + 0.7152*g + 0.0722*b; }
+  function contrastRatio(fg,bg){ const L1=relL(fg), L2=relL(bg); const [Lmax,Lmin]=L1>L2?[L1,L2]:[L2,L1]; return (Lmax+0.05)/(Lmin+0.05); }
+  function updateContrast(){
+    const fg=fgHex.value.trim(); const bg=bgHex.value.trim();
+    if(!/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(fg) || !/^#([0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(bg)){ contrastInfo.textContent='Ratio: –'; return; }
+    const ratio = contrastRatio(hexToRgb(fg), hexToRgb(bg));
+    contrastDemo.style.background=bg; contrastText.style.color=fg;
+    contrastInfo.textContent = `Ratio: ${ratio.toFixed(2)} — ${ratio>=7? 'AAA':' '}${ratio>=4.5? 'AA (normal)':''}${ratio>=3? ' • AA (large)':''}`;
+  }
+  function syncPickers(){ fgHex.value=fgColor.value; bgHex.value=bgColor.value; updateContrast(); }
+  fgColor.addEventListener('input', syncPickers); bgColor.addEventListener('input', syncPickers);
+  fgHex.addEventListener('input', ()=>{ fgColor.value=fgHex.value; updateContrast(); });
+  bgHex.addEventListener('input', ()=>{ bgColor.value=bgHex.value; updateContrast(); });
+  updateContrast();
+
+  // =============================================================
+  // 12) Stopwatch & Countdown
+  // =============================================================
+  // Stopwatch
+  let swStartTime=0, swTimer=null, swElapsed=0;
+  const swDisplay=$('#swDisplay');
+  function fmtMS(ms){ const m=Math.floor(ms/60000); const s=Math.floor((ms%60000)/1000); const cs=Math.floor((ms%1000)/10); return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}.${String(cs).padStart(2,'0')}`; }
+  $('#swStart').addEventListener('click',()=>{
+    if(swTimer) return; swStartTime = Date.now()-swElapsed; swTimer = setInterval(()=>{ swElapsed = Date.now()-swStartTime; swDisplay.textContent = fmtMS(swElapsed); }, 30);
+  });
+  $('#swStop').addEventListener('click',()=>{ if(swTimer){ clearInterval(swTimer); swTimer=null; }});
+  $('#swReset').addEventListener('click',()=>{ swElapsed=0; swDisplay.textContent='00:00.00'; if(swTimer){ clearInterval(swTimer); swTimer=null; }});
+
+  // Countdown
+  let cdRemain=0, cdTimer=null;
+  const cdDisplay=$('#cdDisplay');
+  function fmtS(total){ const m=Math.floor(total/60); const s=total%60; return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`; }
+  function renderCd(){ cdDisplay.textContent=fmtS(cdRemain); }
+  $('#cdStart').addEventListener('click',()=>{
+    const min=parseInt($('#cdMin').value)||0; const sec=parseInt($('#cdSec').value)||0;
+    if(cdRemain<=0) cdRemain = min*60 + sec;
+    if(cdRemain<=0){ toast('Set a time'); return; }
+    if(cdTimer) return;
+    cdTimer=setInterval(()=>{
+      cdRemain--; renderCd();
+      if(cdRemain<=0){ clearInterval(cdTimer); cdTimer=null; toast('⏰ Time!'); }
+    },1000);
+    renderCd();
+  });
+  $('#cdPause').addEventListener('click',()=>{ if(cdTimer){ clearInterval(cdTimer); cdTimer=null; }});
+  $('#cdReset').addEventListener('click',()=>{ cdRemain=0; renderCd(); });
+  renderCd();
+
+  // =============================================================
+  // 13) Quick Notes (localStorage)
+  // =============================================================
+  const NOTES_KEY='a1o_notes_v1';
+  const notesArea=$('#notesArea'); const notesSavedAt=$('#notesSavedAt');
+  // Load
+  try{ const data=localStorage.getItem(NOTES_KEY); if(data) notesArea.value=data; }catch(e){}
+  function saveNotes(){ try{ localStorage.setItem(NOTES_KEY, notesArea.value); notesSavedAt.textContent=new Date().toLocaleTimeString(); }catch(e){} }
+  notesArea.addEventListener('input', ()=>{ saveNotes(); });
+  $('#notesClear').addEventListener('click',()=>{ if(confirm('Clear notes?')){ notesArea.value=''; saveNotes(); }});
+  saveNotes();
+
+  // Accessibility niceties: focus outlines for buttons with keyboard
+  let usingKeyboard=false; window.addEventListener('keydown',()=>usingKeyboard=true,{once:true});
+  document.addEventListener('focusin',e=>{ if(usingKeyboard && e.target.classList?.contains('btn')) e.target.style.boxShadow='var(--ring)';});
+  document.addEventListener('focusout',e=>{ if(e.target.classList?.contains('btn')) e.target.style.boxShadow='';});
+  </script>
+</body>
+</html>
